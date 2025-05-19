@@ -11,6 +11,23 @@ import "react-toastify/dist/ReactToastify.css";
 
 function Startproject({ projectId })
 {
+  const [showSprintList, setShowSprintList] = useState(true); // true by default
+  const [sprints, setSprints] = useState([
+  ]);
+  const [selectedSprint, setSelectedSprint] = useState(null);
+  const [sprintoutput, setsprintoutput] = useState([]);
+
+  const selectSprint = (index) => {
+    setSelectedSprint(index);
+    setShowSprintList(false);
+  };
+  
+  const createNewSprint = () => {
+    setShowSprintList(false);
+  };
+    
+
+  ////
   const [developers, setDevelopers] = useState([]);
   const [assignedDevs, setAssignedDevs] = useState(new Set());
   const [Team, setTeam] = useState([]);
@@ -46,6 +63,8 @@ function Startproject({ projectId })
     const [output, setoutput] = useState([]);
     const [allinputss, setallInputss] = useState([]);
     const [sprintdays, setsprintdays] = useState(0);
+    const [teamvelocity, setteamvelocity] = useState(0);
+
     const [interruptions, setinterruptions] = useState([]); // Initialize developers first
 
     const getTechniqueName = (id) => {
@@ -182,6 +201,16 @@ function Startproject({ projectId })
           setLoading(false);
       }
   };
+  const fetchsprints = async () => {
+    try {
+        const response = await axios.get(`${server}/api/project/${id}/getsprints`);
+        setSprints(response.data.data);  // Assuming response.data.data contains the inputs
+        setLoading(false);
+    } catch (err) {
+        setError('Failed to load inputs');
+        setLoading(false);
+    }
+};
 
 
         const fetchinterruption = async () => {
@@ -199,6 +228,7 @@ function Startproject({ projectId })
       try {
         const output = await axios.get(`${server}/api/project/${id}/fpoutput?project_id=${id}`);
         setoutput(output.data.data);
+        setsprintoutput(output.data.sprint);
       } catch (err) {
           setError('Failed to load inputs');
           setLoading(false);
@@ -352,7 +382,9 @@ function Startproject({ projectId })
           }
           else if(selectedOption === "agile")
             {
-                await axios.post(`${server}/api/project/${id}/insertinput`, {inputs:useCases,selectedOption,selectedSwitches,primary_technique:selectedOptionforcocomo,sprintdays:sprintdays});
+                await axios.post(`${server}/api/project/${id}/insertinput`, {inputs:useCases,selectedOption,selectedSwitches,primary_technique:selectedOptionforcocomo,sprintdays:sprintdays,teamvelocity:teamvelocity});
+                
+                console.log(useCases,selectedOption,selectedSwitches,selectedOptionforcocomo,sprintdays,teamvelocity);
                 setIsSaved(true); // Mark as saved
                 toast.success("Data Recorded successfully!", {
                   position: "top-right",
@@ -362,9 +394,8 @@ function Startproject({ projectId })
                   pauseOnHover: true,
                   draggable: true,
                 });              
-                alert(sprintdays);
+                fetchsprints();
                 document.getElementById("next_btn").style.display = "block";
-      
             }
    
       } catch (error) {
@@ -564,6 +595,7 @@ function Startproject({ projectId })
         
   useEffect(() => {
     fetchallInputs();
+    fetchsprints();
       handleoutput();
     }, []);  // Empty Dependency = Run once (componentDidMount)
     useEffect(() => {
@@ -922,7 +954,7 @@ function Startproject({ projectId })
       onChange={(e) => setSelectedOption(e.target.value)}
       className="form-control"
       style={{
-        width: '250px',
+        width: selectedOption === 'agile' ? '180px' : '250px',
         height: '45px',
         borderRadius: '8px',
         border: '1px solid #ddd',
@@ -936,7 +968,7 @@ function Startproject({ projectId })
       <option value="c1b">Cocomo 1 (Basic)</option>
       <option value="c1i">Cocomo 1 (Intermediate)</option>
       <option value="c1a">Cocomo 1 (Advanced)</option>
-      <option value="c2">Cocomo 2 (Coco 2)</option>
+      {/* <option value="c2">Cocomo 2 (Coco 2)</option> */}
       <option value="agile">Agile (Ag)</option>
     </select>
     {selectedOption !== 'agile' ? (
@@ -1018,7 +1050,19 @@ function Startproject({ projectId })
         type="number"
         onChange={(e) => setsprintdays(Number(e.target.value))} // Convert to number
         placeholder="Enter the Sprint days" required
-        className="form-control col-3" // Changed `class` to `className`
+        className="form-control col-2" // Changed `class` to `className`
+      />
+         <label
+        htmlFor="technique-select"
+        style={{ fontSize: "16px", fontWeight: "500", color: "#555" }}
+      >
+        Team Velocity:
+      </label>
+      <input
+        type="number"
+        onChange={(e) => setteamvelocity(Number(e.target.value))} // Convert to number
+        placeholder="Enter the Team Velocity" required
+        className="form-control col-2" // Changed `class` to `className`
       />
       </>
      
@@ -1722,64 +1766,104 @@ Save
     </div>
   ) : selectedOption === 'agile' ? (
     // Else if: specific UI for "OtherOption2"
-    <div className='card-body' style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
-  
-    <h2 className="text-center mb-4">Agile Input Manager</h2>
-    
+    <>
+      {showSprintList ? (
       
-        <table className="table table-bordered table-hover" id="usecaseTable">
-          
-          <thead className="table-primary">
-            <tr>
-              <th scope="col">User Story</th>
-              <th scope="col" className="text-center">Action
-              <button className="add-row-btn" onClick={addRow} style={{  top: '12px' , color: '#007bff', backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>
-        <i className="bi bi-plus"></i>
-      </button>
-              </th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            {renderPage().map((useCase, index) => (
-              <tr key={index}>
-                <td>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={useCase.name}
-                    onChange={(e) => handleChange(index, e.target.value)}
-                    placeholder="Enter the user story"
-                  />
-                </td>
-                <td className="text-center">
-                  <i
-                    className="bi bi-trash text-danger delete-row-btn"
-                    onClick={() => deleteRow(index)}
-                    style={{ cursor: 'pointer' }}
-                  ></i>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <button className="btn btn-success save-btn" 
-            data-toggle={selectedOption === "agile" ? "modal" : undefined}
-            data-target={selectedOption === "agile" ? "#exampleModalCenter" : undefined}
-            onClick={selectedOption === "agile" ? undefined :saveTable}>Save</button>
-          <nav>
-            <ul className="pagination" id="pagination">
-              {pagination.map(page => (
-                <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
-                  <a className="page-link" href="#" onClick={() => changePage(page)}>{page}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-     
- 
+      <div className='sprint-list'>
+        <h2 className='text-center mb-4'>All Sprints</h2>
+        <ul className='list-group'>
+          {sprints.map((sprint, index) => (
+            <li key={index} className='list-group-item d-flex justify-content-between align-items-center'>
+              Sprint {index+1} - 
+              ({sprint.status})
+              <button className='btn btn-primary btn-sm' onClick={() => selectSprint(sprint.sprint_id)}>View / Edit</button>
+            </li>
+          ))}
+        </ul>
+        <button className='btn btn-outline-success mt-3' onClick={createNewSprint}>
+          + Start New Sprint
+        </button>
+      </div>
+    ) : (
+      <>
+
+      <div className='card-body' style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+        <div>
+        <div className="d-flex align-items-center justify-content-between mb-4">
+  <button className="btn btn-secondary" onClick={() => setShowSprintList(true)}>← Back</button>
+  <h2 className="flex-grow-1 text-center m-0">Sprint Planner</h2>
+  <div style={{ width: '80px' }}></div> {/* Invisible spacer to balance layout */}
 </div>
+
+        </div>
+
+        {/* Your existing Agile Input Manager code here */}
+        <div className='card-body' style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+  
+  <h4 className="text-center mb-4">UserStory Input Manager - <b>(Sprint 0{selectedSprint})</b></h4>
+  
+    
+      <table className="table table-bordered table-hover" id="usecaseTable">
+        
+        <thead className="table-primary">
+          <tr>
+            <th scope="col">User Story</th>
+            <th scope="col" className="text-center">Action
+            <button className="add-row-btn" onClick={addRow} style={{  top: '12px' , color: '#007bff', backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>
+      <i className="bi bi-plus"></i>
+    </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {renderPage().map((useCase, index) => (
+            <tr key={index}>
+              <td>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={useCase.name}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  placeholder="Enter the user story"
+                />
+              </td>
+              <td className="text-center">
+                <i
+                  className="bi bi-trash text-danger delete-row-btn"
+                  onClick={() => deleteRow(index)}
+                  style={{ cursor: 'pointer' }}
+                ></i>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <button className="btn btn-success save-btn" 
+          data-toggle={selectedOption === "agile" ? "modal" : undefined}
+          data-target={selectedOption === "agile" ? "#exampleModalCenter" : undefined}
+          onClick={selectedOption === "agile" ? undefined :saveTable}>Save</button>
+        <nav>
+          <ul className="pagination" id="pagination">
+            {pagination.map(page => (
+              <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
+                <a className="page-link" href="#" onClick={() => changePage(page)}>{page}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+   
+
+</div>
+      </div>
+
+      </>
+     
+    )}
+    </>
+  
+    
   ) :selectedOption === 'not selected' ? ( <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}><br></br>
     <h4 style={{ marginBottom: '10px' }}>Welcome to the Estimation Tool</h4>
     <p>
@@ -1811,9 +1895,11 @@ Save
       </div>
 
       <div className="card-body">
+     
+
         {/* Primary Technique */}
         {item.primary_technique_id && item.primary_technique_id !== "no selected" && (
-          <p className="mb-1"><strong>🎯 Primary Technique:</strong> {getTechniqueName(item.primary_technique_id)}</p>
+          <p className="mb-1"><strong>🎯 Primary Technique:</strong> {getTechniqueName(item.primary_technique_id)+"(Sprint -0"+sprintoutput[0].sprint_no+")"} </p>
         )}
 
         {/* Secondary Technique */}
@@ -1825,22 +1911,43 @@ Save
         {item.estimation_method && (
           <p className="mb-3"><strong>📌 Estimation Method:</strong> {item.estimation_method}</p>
         )}
-
-        {/* Calculation Results */}
-        <ul className="list-group list-group-flush">
-          <li className="list-group-item d-flex justify-content-between">
-            <span>⏳ Effort (Person-Months):</span>
-            <span className="fw-bold">{item.effort}</span>
-          </li>
-          <li className="list-group-item d-flex justify-content-between">
-            <span>📅 Time (Months):</span>
-            <span className="fw-bold">{item.time}</span>
-          </li>
-          <li className="list-group-item d-flex justify-content-between">
-            <span>💰 Cost (USD):</span>
-            <span className="fw-bold text-success">${item.cost}</span>
-          </li>
-        </ul>
+ {item.primary_technique_id == "agile" ? (
+  <>
+    {/* Calculation Results */}
+    <ul className="list-group list-group-flush">
+      <li className="list-group-item d-flex justify-content-between">
+        <span>⏳ Effort (Person-Months):</span>
+        <span className="fw-bold">{sprintoutput[index].effort}</span>
+      </li>
+      <li className="list-group-item d-flex justify-content-between">
+        <span>📅 Time (Months):</span>
+        <span className="fw-bold">{sprintoutput[index].time}</span>
+      </li>
+      <li className="list-group-item d-flex justify-content-between">
+        <span>💰 Cost (USD):</span>
+        <span className="fw-bold text-success">${sprintoutput[index].cost}</span>
+      </li>
+    </ul>
+  </>
+) :   
+<>
+<ul className="list-group list-group-flush">
+  <li className="list-group-item d-flex justify-content-between">
+    <span>⏳ Effort (Person-Months):</span>
+    <span className="fw-bold">{item.effort}</span>
+  </li>
+  <li className="list-group-item d-flex justify-content-between">
+    <span>📅 Time (Months):</span>
+    <span className="fw-bold">{item.time}</span>
+  </li>
+  <li className="list-group-item d-flex justify-content-between">
+    <span>💰 Cost (USD):</span>
+    <span className="fw-bold text-success">${item.cost}</span>
+  </li>
+</ul>
+</>
+}
+      
       </div>
     </div>
   ))}
@@ -1888,7 +1995,6 @@ Save
 
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save changes</button>
               </div>
             </div>
         </div>

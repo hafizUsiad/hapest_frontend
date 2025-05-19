@@ -9,6 +9,7 @@ import Startproject from './Component/project/start';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Employees from './Component/employees';
 import Interruption from './Component/interruption';
+import Task from './Component/project/task';
 
 
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/employees" element={<Employees />} />
         <Route path="/interruption" element={<Interruption />} />
         <Route path="/project/start/:id" element={<Startproject />} />
+        <Route path="/project/task/:id" element={<Task />} />
 
 
       </Routes>
