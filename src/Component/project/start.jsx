@@ -406,14 +406,14 @@ function Startproject({ projectId })
    
       } catch (error) {
         console.error("Error sending data:", error);
-        toast.error("Failed to Save Data!", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });      
+        // toast.error("Failed to Save Data!", {
+        //   position: "top-right",
+        //   autoClose: 2000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        // });      
       }
     };
   
@@ -493,14 +493,15 @@ function Startproject({ projectId })
                 
        
         } catch (error) {
-          toast.error("Data Saving Failed!", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });          console.error(error);
+          // toast.error("Data Saving Failed!", {
+          //   position: "top-right",
+          //   autoClose: 2000,
+          //   hideProgressBar: false,
+          //   closeOnClick: true,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          // });  
+                  console.error(error);
         }
       };
     
@@ -829,8 +830,8 @@ function Startproject({ projectId })
                       <h4 class="card-title">Project Id is : 00{id}</h4>
                   </div>
                   <div>
-                    <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#exampleModalCenteredScrollable2"><i class="fas fa-exclamation-triangle"></i></button>|
-                  <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenteredScrollable"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#exampleModalCenteredScrollable2"><i class="fas fa-exclamation-triangle"></i>Interruption</button>|
+                  <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenteredScrollable"><i class="fas fa-eye"></i>All Inputs</button>
 
                   </div>
                   </div>
@@ -858,58 +859,58 @@ function Startproject({ projectId })
                         <h4 class="card-title">Team Selection</h4>
                      </div>
                   </div>
-                  <div class="card-body">
-                     <p>Assign the project to developers by checked on them </p>
-                     <div class="table-responsive">
-                        <table id="datatable" class="table data-table table-striped">
-                           <thead>
-                              <tr class="ligth">
-                                 <th>Name</th>
-                                 <th>Email</th>
-                                 <th>Expertise</th>
-                                 <th>Asssigned</th>
-                              </tr>
-                           </thead>
-                           <tbody>
-                           { 
-                           developers.map((developer,index) => (
-                            
-                            <tr key={developer.userid}>
-                              <td>{developer.userid}</td>
-                              <td>{developer.name}</td>
-                              <td hidden>{developer.email}</td>
-                              <td>{developer.expertise}</td>
-                              {userrole === 1?(
-                                <td>
-                                  <input 
-                                    type="checkbox" 
-                                    checked={Team.some(member => member.developer_id === developer.userid) || assignedDevs.has(developer.userid)}
-                                    onChange={() => assignteam(developer.userid)} 
-                                  />
-                                </td>
-                              ): <td>
-                              <input 
-                                type="checkbox" disabled
-                                checked={Team.some(member => member.developer_id === developer.userid) || assignedDevs.has(developer.userid)}
-                                onChange={() => assignteam(developer.userid)} 
-                              />
-                            </td>}
-                              
-                              
-                            </tr>
-                             ))}
-                           </tbody>
-                           <tfoot>
-                              <tr>
-                                 <th>Name</th>
-                                 <th>Email</th>
-                                 <th>Expertise</th>
-                                 <th>Asssigned</th>
-                              </tr>
-                           </tfoot>
-                        </table>
-                     </div>
-                  </div>
+                 <div className="card-body">
+  <p>Assign the project to developers by checking them:</p>
+  <div className="table-responsive">
+    <table className="table table-bordered table-hover">
+      <thead className="table-primary text-center">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Expertise</th>
+          <th>Assigned</th>
+        </tr>
+      </thead>
+      <tbody>
+        {developers.length > 0 ? (
+          developers.map((developer) => (
+            <tr key={developer.userid}>
+              <td>{developer.name}</td>
+              <td>{developer.email}</td>
+              <td>{developer.expertise}</td>
+              <td className="text-center">
+                <input
+                  type="checkbox"
+                  checked={
+                    Team.some((member) => member.developer_id === developer.userid) ||
+                    assignedDevs.has(developer.userid)
+                  }
+                  onChange={() => assignteam(developer.userid)}
+                  disabled={userrole !== 1}
+                />
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="4" className="text-center text-muted">
+              No developers available
+            </td>
+          </tr>
+        )}
+      </tbody>
+      <tfoot className="table-light text-center">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Expertise</th>
+          <th>Assigned</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+ 
                </div>
             </div>
          </div>
@@ -1000,7 +1001,7 @@ function Startproject({ projectId })
       }}
     >
       <option value="not selected">Select The Method</option>
-      {selectedOption === 'FP' ? (
+      {/* {selectedOption === 'FP' ? (
 
 <option value="FP">Function Points (FP)</option>
 
@@ -1017,7 +1018,7 @@ function Startproject({ projectId })
         <option value="c2">Cocomo 2 (Coco 2)</option>
     ):selectedOption === "agile"?(
         <option value="agile">Agile (Ag)</option>
-    ):null}
+    ):null} */}
       <option value="PP">Poker Planning (PP)</option>
       <option value="FC">Fibonacci Series (FC)</option>
     </select>
@@ -1039,7 +1040,7 @@ function Startproject({ projectId })
         boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
       }}
     >
-<option value="kloc">Using KLOC</option>
+{/* <option value="kloc">Using KLOC</option> */}
 <option value="fp">Using Functional Point</option>
 
     </select>
@@ -1239,7 +1240,13 @@ function Startproject({ projectId })
                                       ))}
                               </>
                        
-                          ):null}
+                          ): <> 
+                                  {assigned_weights.map((item) => (
+                                        <option key={item.weight_id} value={item.weight}>
+                                            {item.weight} 
+                                        </option>
+                                        ))}
+                                </>}
                                     
                                 </select>
                             </td>
@@ -1923,63 +1930,65 @@ Save
         <h5 className="mb-0">🛠️ Calculated Values</h5>
       </div>
 
-      <div className="card-body">
-     
+    <div className="card-body">
+  {/* Primary Technique */}
+  {item.primary_technique_id && item.primary_technique_id !== "no selected" && (
+    <p className="mb-1">
+      <strong>🎯 Primary Technique:</strong>{" "}
+      {getTechniqueName(item.primary_technique_id) +
+        `(Sprint -0${sprintoutput?.[index]?.sprint_no ?? ""})`}
+    </p>
+  )}
 
-        {/* Primary Technique */}
-        {item.primary_technique_id && item.primary_technique_id !== "no selected" && (
-          <p className="mb-1"><strong>🎯 Primary Technique:</strong> {getTechniqueName(item.primary_technique_id)+"(Sprint -0"+sprintoutput[0].sprint_no+")"} </p>
-        )}
+  {/* Secondary Technique */}
+  {item.secondary_technique_id && item.secondary_technique_id !== "no selected" && (
+    <p className="mb-1">
+      <strong>🔄 Secondary Technique:</strong> {getTechniqueName(item.secondary_technique_id)}
+    </p>
+  )}
 
-        {/* Secondary Technique */}
-        {item.secondary_technique_id && item.secondary_technique_id !== "no selected" && (
-          <p className="mb-1"><strong>🔄 Secondary Technique:</strong> {getTechniqueName(item.secondary_technique_id)}</p>
-        )}
+  {/* Estimation Method */}
+  {item.estimation_method && (
+    <p className="mb-3">
+      <strong>📌 Estimation Method:</strong> {item.estimation_method || ""}
+    </p>
+  )}
 
-        {/* Estimation Method */}
-        {item.estimation_method && (
-          <p className="mb-3"><strong>📌 Estimation Method:</strong> {item.estimation_method}</p>
-        )}
- {item.primary_technique === "agile" ? (
-  <ul className="list-group list-group-flush">
-    <li className="list-group-item d-flex justify-content-between">
-      <span>⏳ Effort (Person-Months):</span>
-      <span className="fw-bold">
-        {sprintoutput[index] ? sprintoutput[index].effort : "N/A"}
-      </span>
-    </li>
-    <li className="list-group-item d-flex justify-content-between">
-      <span>📅 Time (Months):</span>
-      <span className="fw-bold">
-        {sprintoutput[index] ? sprintoutput[index].time : "N/A"}
-      </span>
-    </li>
-    <li className="list-group-item d-flex justify-content-between">
-      <span>💰 Cost (USD):</span>
-      <span className="fw-bold text-success">
-        ${sprintoutput[index] ? sprintoutput[index].cost : "N/A"}
-      </span>
-    </li>
-  </ul>
-) : (
-  <ul className="list-group list-group-flush">
-    <li className="list-group-item d-flex justify-content-between">
-      <span>⏳ Effort (Person-Months):</span>
-      <span className="fw-bold">{item.effort}</span>
-    </li>
-    <li className="list-group-item d-flex justify-content-between">
-      <span>📅 Time (Months):</span>
-      <span className="fw-bold">{item.time}</span>
-    </li>
-    <li className="list-group-item d-flex justify-content-between">
-      <span>💰 Cost (USD):</span>
-      <span className="fw-bold text-success">${item.cost}</span>
-    </li>
-  </ul>
-)}
+  {item.primary_technique === "agile" ? (
+    <ul className="list-group list-group-flush">
+      <li className="list-group-item d-flex justify-content-between">
+        <span>⏳ Effort (Person-Months):</span>
+        <span className="fw-bold">{sprintoutput?.[index]?.effort ?? ""}</span>
+      </li>
+      <li className="list-group-item d-flex justify-content-between">
+        <span>📅 Time (Months):</span>
+        <span className="fw-bold">{sprintoutput?.[index]?.time ?? ""}</span>
+      </li>
+      <li className="list-group-item d-flex justify-content-between">
+        <span>💰 Cost (USD):</span>
+        <span className="fw-bold text-success">
+          {sprintoutput?.[index]?.cost ? `$${sprintoutput[index].cost}` : ""}
+        </span>
+      </li>
+    </ul>
+  ) : (
+    <ul className="list-group list-group-flush">
+      <li className="list-group-item d-flex justify-content-between">
+        <span>⏳ Effort (Person-Months):</span>
+        <span className="fw-bold">{item.effort || ""}</span>
+      </li>
+      <li className="list-group-item d-flex justify-content-between">
+        <span>📅 Time (Months):</span>
+        <span className="fw-bold">{item.time || ""}</span>
+      </li>
+      <li className="list-group-item d-flex justify-content-between">
+        <span>💰 Cost (USD):</span>
+        <span className="fw-bold text-success">{item.cost ? `$${item.cost}` : ""}</span>
+      </li>
+    </ul>
+  )}
+</div>
 
-      
-      </div>
     </div>
   ))}
 </div>

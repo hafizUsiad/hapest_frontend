@@ -212,6 +212,7 @@ const TaskAssignment = () => {
     try {
       const response = await axios.get(`${server}/api/project/${projectId}/getsprints`);
       setSprints(response.data.data);
+      console.log(response.data.data);
       fetchDevelopers();
     } catch (err) {
       console.error('Error fetching sprints:', err);
@@ -402,7 +403,7 @@ const estimatesprint = async () => {
       {sprints.length > 0 && (
         <div>
           <label>Select Sprint:</label>
-          <select className="form-control" value={selectedSprint} onChange={handleSprintChange}>
+          <select className="form-control" onChange={handleSprintChange}>
             <option value="">Select Sprint</option>
             {sprints.map((sprint) => (
               <option key={sprint.sprint_id} value={sprint.sprint_id}>Sprint {sprint.sprint_no}</option>

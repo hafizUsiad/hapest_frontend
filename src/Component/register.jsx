@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Register() {
 
-  const [user, setUser] = useState({ name: '', email: '', password: '',userrole: '' });
+  const [user, setUser] = useState({ name: '', email: '', password: '',userrole: 2 });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -64,19 +64,7 @@ function Register() {
                                                                 <label>Email</label>
                                                             </div>
                                                         </div>
-                                                        <div className="col-lg-6">
-                                                            <div className="floating-label form-group">
-                                                                <select className="floating-input form-control" type="text" placeholder=" " 
-                                                                onChange={(e) => setUser({ ...user, password: e.target.value })} 
-                                                                >
-                                                                    <option disabled>Choose the User Role</option>
-                                                                    <option value={2}>Product Owner/Customer</option>
-                                                                    <option value={3}>Developer</option>
-
-                                                                </select>
-                                                                <label>Phone No.</label>
-                                                            </div>
-                                                        </div>
+                                                        
                                                         <div className="col-lg-6">
                                                             <div className="floating-label form-group">
                                                                 <input className="floating-input form-control" type="password" placeholder=" " 
@@ -86,13 +74,7 @@ function Register() {
                                                                 <label>Password</label>
                                                             </div>
                                                         </div>
-                                                        <div className="col-lg-6">
-                                                            <div className="floating-label form-group">
-                                                                <input className="floating-input form-control" type="password" placeholder=" " />
-                                                                <label>Confirm Password</label>
-                                                            </div>
-                                                        </div>
-                                                        
+                                                       
                                                         <div className="col-lg-12">
                                                             <div className="custom-control custom-checkbox mb-3">
                                                                 <input type="checkbox" className="custom-control-input" id="customCheck1" />
